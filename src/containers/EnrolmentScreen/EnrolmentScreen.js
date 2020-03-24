@@ -32,6 +32,7 @@ const EnrolmentView = (props) => {
       typeName: 'Part-time'
     }
   ]);
+  const [studyPlan, setStudyPlan] = useState(null);
 
   // This section mocks setting of states after receiving server response.
   useEffect(() => {
@@ -60,9 +61,27 @@ const EnrolmentView = (props) => {
     }
   }, []);
 
+  // Button to retrieve list of subjects.
+  let showSubjectsButton = null;
+  if (student.studentType && qualificationToEnroll && selectedCampus && !studyPlan) {
+    const showSubjectsButtonClickHandler = () => {
+      // const qualificationWithSubjects = studentData.qualifications
+      //   .filter(qualification => qualification.qualificationNationalCode ===)
+      //TODO
+
+      // setStudyPlan();
+    };
+
+    showSubjectsButton = (
+      <button
+        className="btn btn-primary btn-lg btn-block"
+        onClick={showSubjectsButtonClickHandler}>Show Subjects</button>
+    );
+  }
+
   return (
     <Fragment>
-      <h1>Course Enrolment</h1>
+      <h1>Enrolment</h1>
       <EnrolmentSettings
         student={student}
         availableQualifications={availableQualifications}
@@ -71,8 +90,12 @@ const EnrolmentView = (props) => {
         selectedCampus={selectedCampus}
         setSelectedCampus={setSelectedCampus}
         studentTypes={studentTypes}
-        setStudent={setStudent} />
-      <Courses />
+        setStudent={setStudent}
+        setStudyPlan={setStudyPlan} />
+      {showSubjectsButton}
+      {(studyPlan)
+        ? <Courses />
+        : null}
     </Fragment>
   );
 };
