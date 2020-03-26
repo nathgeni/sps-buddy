@@ -1,2 +1,1 @@
-## Available Scripts
-5WORK project
+## 5WORK project
