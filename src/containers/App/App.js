@@ -8,9 +8,6 @@ import { library } from '@fortawesome/fontawesome-svg-core';
 import { faChevronRight, faChevronLeft, faEnvelope, faTimes, faBan } from '@fortawesome/free-solid-svg-icons';
 library.add(faChevronRight, faChevronLeft, faEnvelope, faTimes, faBan)
 
-import { library } from '@fortawesome/fontawesome-svg-core';
-import { faChevronRight, faChevronLeft, faEnvelope } from '@fortawesome/free-solid-svg-icons';
-
 library.add(faChevronRight, faChevronLeft, faEnvelope)
 
 
