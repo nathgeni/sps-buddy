@@ -1,11 +1,14 @@
 import React, { Fragment } from 'react';
 
+import Header from '../../components/Header/Header';
+import Footer from '../../components/Footer/Footer';
+
 const Layout = (props) => {
   return (
     <Fragment>
-      <div>Naviagtion and header component goes here</div>
+      <Header />
       <main className="container">{props.children}</main>
-      <div>Footer component goes here</div>
+      <Footer />
     </Fragment>
   );
 };
