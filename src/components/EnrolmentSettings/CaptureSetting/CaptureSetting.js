@@ -40,13 +40,9 @@ const captureSetting = (props) => {
   const onSelectionChangedHandler = (event) => {
     // Changes state when new value is not an empty string.
     if (event.target.value) {
-      const selectedOption = props.options.filter(option => option[props.valueKey] === event.target.value);
-      // Updates state if selected option is unique in the ptops.options.
-      if (selectedOption.length === 1) {
-        props.updateTargetedState(selectedOption[0]);
-      } else {
-        console.error('Selected option is not unique.');
-      }
+      props.updateTargetedState(
+        props.options.find(option => option[props.valueKey] === event.target.value)
+      );
     }
   };
 
@@ -71,6 +67,7 @@ const captureSetting = (props) => {
 captureSetting.propTypes = {
   options: PropTypes.array,
   optionKey: PropTypes.string,
+  valueKey: PropTypes.string,
   optionDisplayKeys: PropTypes.array,
   optionDisplayValueDelimiter: PropTypes.string,
   selectID: PropTypes.string,

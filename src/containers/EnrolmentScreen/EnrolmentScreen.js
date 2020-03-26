@@ -1,8 +1,9 @@
 import React, { Fragment, useState, useEffect } from 'react';
 
-import Courses from '../../components/Courses/Courses';
+import Subjects from '../../components/Subjects/Subjects';
 import EnrolmentSettings from '../../components/EnrolmentSettings/EnrolmentSettings';
 import ErrorView from '../../components/ErrorView/ErrorView';
+import EnrolmentSummary from '../../components/EnrolmentSummary/EnrolmentSummary';
 
 // Rough representation of the server response.
 import studentData from '../../models/dummyData/mockStudentData/mockStudentData';
@@ -25,14 +26,27 @@ const EnrolmentView = (props) => {
   const [studentTypes] = useState([
     {
       typeID: 'FT',
-      typeName: 'Full-time'
+      typeName: 'Full-time',
+      minNumberOfCourses: 5,
     },
     {
       typeID: 'PT',
-      typeName: 'Part-time'
+      typeName: 'Part-time',
+      minNumberOfCourses: 2,
     }
   ]);
-  const [studyPlan, setStudyPlan] = useState(null);
+  const [studyPlan, setStudyPlan] = useState([]);
+  const [error, setError] = useState(null)
+  const [showCourses, setShowCourses] = useState(false);
+  const [enrollingSemester, setEnrollingSemester] = useState('2020 S1');
+  const [selectedSubjects, setSelectedSubjects] = useState([]);
+
+  // Displays error if any.
+  const errorSection = (error)
+    ? (
+      <ErrorView errorMessage={error} />
+    )
+    : null;
 
   // This section mocks setting of states after receiving server response.
   useEffect(() => {
@@ -55,32 +69,79 @@ const EnrolmentView = (props) => {
         setQualificationToEnroll(studentQualifications[0]);
       }
     } else {
-      return (
-        <ErrorView errorMessage='No qualification to proceed with enrolment' />
-      )
+      setError('No qualification to proceed with enrolment');
     }
   }, []);
 
-  // Button to retrieve list of subjects.
-  let showSubjectsButton = null;
-  if (student.studentType && qualificationToEnroll && selectedCampus && !studyPlan) {
-    const showSubjectsButtonClickHandler = () => {
-      // const qualificationWithSubjects = studentData.qualifications
-      //   .filter(qualification => qualification.qualificationNationalCode ===)
-      //TODO
+  /**
+   * Sets study plan to show. May query DB here.
+   */
+  const getStudyPlanForSelectedQualification = () => {
+    const selectedStudyPlan = studentData.qualifications.find(qualification =>
+      qualification.qualificationNationalCode === qualificationToEnroll.qualificationNationalCode)
+      .studyPlan;
 
-      // setStudyPlan();
-    };
-
-    showSubjectsButton = (
-      <button
-        className="btn btn-primary btn-lg btn-block"
-        onClick={showSubjectsButtonClickHandler}>Show Subjects</button>
-    );
+    if (selectedStudyPlan) {
+      const newStudyPlan = [...selectedStudyPlan];
+      setStudyPlan(newStudyPlan);
+      let preselectedSubjects = [];
+      newStudyPlan.forEach(semester => {
+        const semesterPreselectedSubjects = semester.subjects.filter(subject => {
+          // Adds semester data to a preselected subject in order to retrieve from selectedSubjects.
+          if (subject.selected) {
+            subject.parentSemester = semester.semester;
+            return true;
+          } else {
+            return false;
+          }
+        });
+        if (semesterPreselectedSubjects && semesterPreselectedSubjects.length > 0) {
+          preselectedSubjects = preselectedSubjects.concat(semesterPreselectedSubjects);
+        }
+      });
+      setSelectedSubjects(preselectedSubjects);
+    } else {
+      setSelectedSubjects([]);
+      setStudyPlan([]);
+      setError('No subhects to enrol');
+    }
   }
+
+  /**
+   * Handles subject selection. Changes data in stdudy plan and selected courses.
+   * 
+   * @param {string} semester - semester name
+   * @param {string} nationalCode - subject national code
+   */
+  const subjectSelectionChangedHandler = (semester, nationalCode) => {
+    setStudyPlan(oldState => {
+      // Needs to create a new study plan list to trigger rerenderring as
+      // selection changes happen in subject object that passes by reference.
+      const newState = [...oldState];
+      const selectedSemester = newState.find(studyPlanSemester => studyPlanSemester.semester === semester);
+      const selectedSemesterSubject = selectedSemester.subjects.find(subject => subject.nationalCode === nationalCode);
+      selectedSemesterSubject.selected = !selectedSemesterSubject.selected;
+
+      // Updates selected subjects.
+      setSelectedSubjects(oldSelection => {
+        const newSelection = [...oldSelection];
+        if (selectedSemesterSubject.selected) {
+          // Adds semester name to the selected subject.
+          selectedSemesterSubject.parentSemester = semester;
+          newSelection.push(selectedSemesterSubject);
+        } else {
+          return newSelection.filter(subject => subject.nationalCode !== nationalCode);
+        }
+        return newSelection;
+      });
+
+      return newState;
+    });
+  };
 
   return (
     <Fragment>
+      {errorSection}
       <h1>Enrolment</h1>
       <EnrolmentSettings
         student={student}
@@ -91,11 +152,24 @@ const EnrolmentView = (props) => {
         setSelectedCampus={setSelectedCampus}
         studentTypes={studentTypes}
         setStudent={setStudent}
-        setStudyPlan={setStudyPlan} />
-      {showSubjectsButton}
-      {(studyPlan)
-        ? <Courses />
-        : null}
+        getStudyPlanForSelectedQualification={getStudyPlanForSelectedQualification}
+        showCourses={showCourses}
+        setShowCourses={setShowCourses}
+        setSelectedSubjects={setSelectedSubjects}
+        setStudyPlan={setStudyPlan}
+      />
+      <Subjects
+        showCourses={showCourses}
+        studyPlan={studyPlan}
+        enrollingSemester={enrollingSemester}
+        subjectSelectionChangedHandler={subjectSelectionChangedHandler}
+      />
+      <EnrolmentSummary
+        showCourses={showCourses}
+        selectedSubjects={selectedSubjects}
+        minNumberOfCourses={(student.studentType) ? student.studentType.minNumberOfCourses : -1}
+        subjectSelectionChangedHandler={subjectSelectionChangedHandler}
+      />
     </Fragment>
   );
 };

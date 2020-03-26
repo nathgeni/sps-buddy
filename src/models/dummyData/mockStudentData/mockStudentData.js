@@ -29,7 +29,7 @@ const studentData = {
       studyPlan: [
         {
           semester: '2019 S2',
-          gradedSubjects: [
+          subjects: [
             {
               subjectCode: '5C#W',
               subjectName: 'Advance C# Web (ASP.NET 4.0)',
@@ -39,7 +39,11 @@ const studentData = {
               tafeCode: 'TAADN',
               trainingPackage: 'C',
               credits: 80,
-              grade: "Credit"
+              grade: "Credit",
+              campus: {
+                campusCode: 'ADL',
+                campusName: 'Adelaide City',
+              },
             },
             {
               subjectCode: '5JAM',
@@ -50,16 +54,17 @@ const studentData = {
               tafeCode: 'TAADP',
               trainingPackage: 'C',
               credits: 60,
-              grade: "Distinction"
+              grade: "Distinction",
+              campus: {
+                campusCode: 'EXT',
+                campusName: 'External',
+              },
             },
           ],
-          selectableSubjects: null,
-          unavailableSubjects: null,
         },
         {
           semester: '2020 S1',
-          gradedSubjects: null,
-          selectableSubjects: [
+          subjects: [
             {
               subjectCode: '5IOSMD',
               subjectName: 'iOS Mobile Application Development',
@@ -70,6 +75,7 @@ const studentData = {
               trainingPackage: 'LE',
               credits: 60,
               price: 357.00,
+              selected: false,
             },
             {
               subjectCode: '5JAW',
@@ -81,6 +87,7 @@ const studentData = {
               trainingPackage: 'C',
               credits: 80,
               price: 476.00,
+              selected: false,
             },
             {
               subjectCode: '5MITP',
@@ -92,14 +99,14 @@ const studentData = {
               trainingPackage: 'LE',
               credits: 80,
               price: 476.00,
+              selected: false,
             }
           ],
-          unavailableSubjects: null,
         },
         {
           semester: '2020 S2',
-          gradedSubjects: null,
-          selectableSubjects: [
+          gradedSubjects: [],
+          subjects: [
             {
               subjectCode: '5TSD',
               subjectName: 'Team Based Software Development',
@@ -110,6 +117,7 @@ const studentData = {
               trainingPackage: 'C',
               credits: 60,
               price: 357.00,
+              selected: false,
             },
             {
               subjectCode: '5TSD',
@@ -121,9 +129,8 @@ const studentData = {
               trainingPackage: 'C',
               credits: 40,
               price: 238.00,
-            }
-          ],
-          unavailableSubjects: [
+              selected: false,
+            },
             {
               subjectCode: '5SDA',
               subjectName: 'Systems Design Advanced',

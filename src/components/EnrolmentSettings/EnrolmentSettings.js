@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 
 import CaptureSetting from './CaptureSetting/CaptureSetting';
@@ -16,13 +16,18 @@ import DisplaySetting from './DisplaySetting/DisplaySetting';
  *  {func} setSelectedCampus - sets selected campus,
  *  {array} studentTypes - available student types (like full-time/part-time),
  *  {func} setStudent - sets student's data,
- *  {func} setStudyPlan - needs to reset displaying study plan.
+ *  {bool} showCourses - defines if courses shown,
+ *  {func} setShowCourses - sets state for showCourses,
+ *  {func} getStudyPlanForSelectedQualification - show course button on click handler,
+ *  {func} setSelectedSubjects - used to delete selected subjects,
+ *  {func} setStudyPlan - to remove study plan on settings changed.
  */
 const enrollmentSettings = (props) => {
 
-  // If qualification selected renders its data, input field otherwise.
+  // Declares sections for later use.
   let campusSection = null;
   let studentTypeSection = null;
+  let showSubjectsButton = null;
 
   /**
    * Updates state for a selected qualification. If qualification has only one
@@ -38,6 +43,7 @@ const enrollmentSettings = (props) => {
     }
   };
 
+  // Lets user to choose qualification.
   let qualificationSection = (
     <CaptureSetting
       options={props.availableQualifications}
@@ -53,6 +59,7 @@ const enrollmentSettings = (props) => {
   );
 
   if (props.qualificationToEnroll) {
+    // Functions to reset selections.
     /**
      * Resets student type and student plan.
      */
@@ -63,7 +70,9 @@ const enrollmentSettings = (props) => {
           studentType: null,
         }
       });
-      props.setStudyPlan(null);
+      props.setShowCourses(false);
+      props.setSelectedSubjects([]);
+      props.setStudyPlan([]);
     };
 
     /**
@@ -82,6 +91,7 @@ const enrollmentSettings = (props) => {
       campusChangeButtonClickHandler();
     };
 
+    // Displays selected qualification.
     qualificationSection = (
       <DisplaySetting
         numberOfOptions={props.availableQualifications.length}
@@ -95,6 +105,7 @@ const enrollmentSettings = (props) => {
       />
     );
 
+    // Renders input to select campus.
     campusSection = (
       <CaptureSetting
         options={props.qualificationToEnroll.availableCampuses}
@@ -111,7 +122,7 @@ const enrollmentSettings = (props) => {
     );
 
     if (props.selectedCampus) {
-
+      // Reners selected campus.
       campusSection = (
         <DisplaySetting
           numberOfOptions={props.qualificationToEnroll.availableCampuses.length}
@@ -135,39 +146,71 @@ const enrollmentSettings = (props) => {
         });
       };
 
-      studentTypeSection = (props.student.studentType)
-        ? (
+      // Reders input to select student type.
+      studentTypeSection = (
+        <CaptureSetting
+          options={props.studentTypes}
+          optionKey='typeID'
+          valueKey='typeID'
+          optionDisplayKeys={['typeName']}
+          updateTargetedState={studentTypeChangedHandler}
+          selectID='selectStudentType'
+          label='Select Student Type'
+          currentStateValue={props.student.studentType}
+          optionPlaceholder='Student Type'
+        />
+      );
+
+      if (props.student.studentType) {
+        // Renders selected student type.
+        studentTypeSection = (
           <DisplaySetting
             numberOfOptions={props.studentTypes.length}
             changeButtonClickHandler={studentTypeChangeButtonClickHandler}
             displayObject={props.student.studentType}
             displayLabelKeyPairs={[['Student Type:', 'typeName']]}
           />
-        )
-        : (
-          <CaptureSetting
-            options={props.studentTypes}
-            optionKey='typeID'
-            valueKey='typeID'
-            optionDisplayKeys={['typeName']}
-            updateTargetedState={studentTypeChangedHandler}
-            selectID='selectStudentType'
-            label='Select Student Type'
-            currentStateValue={props.student.studentType}
-            optionPlaceholder='Student Type'
-          />
         );
+
+        // Renders button to show courses for selected options. Button should
+        // disappear after courses shown to the user.
+        if (!props.showCourses) {
+          /**
+           * Sets courses to display according to the settings.
+           */
+          const showSubjectButtonClickHandler = () => {
+            props.getStudyPlanForSelectedQualification();
+            props.setShowCourses(true);
+          };
+
+          showSubjectsButton = (
+            <button
+              className="btn btn-primary btn-lg btn-block"
+              onClick={showSubjectButtonClickHandler}
+            >
+              Show Subjects
+            </button>
+          );
+        }
+      }
     }
   }
 
   return (
-    <Fragment>
-      <h2>Student's Data</h2>
-      <div>Student: {props.student.firstName} {props.student.lastName}</div>
-      {qualificationSection}
-      {campusSection}
-      {studentTypeSection}
-    </Fragment>
+    <section>
+      <div className='card shadow my-3'>
+        <div className='card-body'>
+          <h2 className='card-title'>Student's Data</h2>
+          <div>Student: {props.student.firstName} {props.student.lastName}</div>
+          <form>
+            {qualificationSection}
+            {campusSection}
+            {studentTypeSection}
+            {showSubjectsButton}
+          </form>
+        </div>
+      </div>
+    </section>
   );
 };
 
@@ -180,6 +223,10 @@ enrollmentSettings.propTypes = {
   setSelectedCampus: PropTypes.func,
   studentTypes: PropTypes.array,
   setStudent: PropTypes.func,
+  showCourses: PropTypes.bool,
+  setShowCourses: PropTypes.func,
+  getStudyPlanForSelectedQualification: PropTypes.func,
+  setSelectedSubjects: PropTypes.func,
   setStudyPlan: PropTypes.func,
 };
 
