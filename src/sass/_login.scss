@@ -1,0 +1,65 @@
+.loginCard{
+
+  margin-top: 100px;
+  margin-bottom: 100px;
+  border: 1px solid $red;
+
+  a{
+
+    color: $black;
+    font-weight: bold;
+
+    &:hover{
+
+      color: $red;
+
+    }
+
+  }
+
+}
+
+.btn-login{
+
+  background: $red;
+  color: white;
+  width: 100%;
+  margin-top: 20px;
+  height: 50px;
+  border: 1px solid $black;
+
+  &:hover{
+
+    background: white;
+    border: 1px solid $red;
+    color: $red;
+
+  }
+
+}
+
+.btn-back{
+
+  background: white;
+  color: $red;
+  width: 100%;
+  margin-top: 20px;
+  height: 50px;
+  border: 1px solid $red;
+
+  &:hover{
+
+    background: $red;
+    border: 1px solid white;
+    color: white;
+    border: 1px solid $black;
+
+  }
+
+}
+
+input{
+
+  border: 1px solid $red!important;
+
+}

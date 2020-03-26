@@ -1,13 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import styles from './LoginInput.module.css';
-
 const logInInput = (props) => (
     <div className="form-group">
         <label htmlFor={props.inputId}>{props.label}</label>
         <input
-            className={[styles.Myinput, "form-control"].join(" ")}
+            className="form-control"
             id={props.inputId}
             type={props.inputType}
             placeholder={props.inputPlaceholder}
@@ -15,8 +13,6 @@ const logInInput = (props) => (
             onChange={props.onChangeHandler}/>
     </div>
 );
-
-
 
 logInInput.propTypes = {
     inputId: PropTypes.string,
